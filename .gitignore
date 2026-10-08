@@ -55,3 +55,10 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# VS Code Local History extension
+.history/
+
+# macOS system files
+.DS_Store
+*.DS_Store
