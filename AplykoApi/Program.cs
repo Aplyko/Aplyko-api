@@ -20,6 +20,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGet("/", () => users);
+app.MapGet("/", () => "Hot reloading working");
 
 app.Run();

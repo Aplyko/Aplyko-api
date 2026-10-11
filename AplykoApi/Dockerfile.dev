@@ -1,0 +1,10 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
+WORKDIR /source
+
+COPY AplykoApi/AplykoApi.csproj ./AplykoApi/
+WORKDIR /source/AplykoApi
+RUN dotnet restore
+
+COPY AplykoApi/. .
+
+ENTRYPOINT ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:8080"]
