@@ -1,0 +1,14 @@
+services:
+  aplyko-db:
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD_DEV}
+      POSTGRES_DB: ${PG_DB_NAME}
+
+  aplyko-api:
+    build:
+      context: .
+      dockerfile: ./AplykoApi/Dockerfile.dev
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__default=Host=aplyko-db;Database=PersonDb;Username=${PG_USER};Password=${PG_PASSWORD_DEV}
