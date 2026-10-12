@@ -58,6 +58,8 @@ nunit-*.xml
 
 # VS Code Local History extension
 .history/
+.vscode/
+.idea/
 
 # macOS system files
 .DS_Store
