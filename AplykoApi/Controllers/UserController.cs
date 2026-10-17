@@ -21,10 +21,10 @@ public sealed class UserController : ControllerBase
 
     // GET /api/user
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
+    public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetAllUsers()
     {
         var users = await _context.Users
-            .Select(u => new UserDto
+            .Select(u => new UserResponseDto()
             {
                 Id = u.Id,
                 Email = u.Email,
@@ -38,7 +38,7 @@ public sealed class UserController : ControllerBase
 
     // GET /api/user/{id}
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<UserDto>> GetUserById(Guid id)
+    public async Task<ActionResult<UserResponseDto>> GetUserById(Guid id)
     {
         var user = await _context.Users.FindAsync(id);
 
@@ -47,7 +47,7 @@ public sealed class UserController : ControllerBase
             return NotFound();
         }
 
-        var userDto = new UserDto
+        var userDto = new UserResponseDto
         {
             Id = user.Id,
             Email = user.Email,
@@ -60,7 +60,7 @@ public sealed class UserController : ControllerBase
 
     // PUT /api/user/{id}
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserDto dto)
+    public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserRequestDto userData)
     {
         var user = await _context.Users.FindAsync(id);
         if (user == null)

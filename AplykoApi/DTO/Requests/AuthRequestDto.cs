@@ -1,8 +1,9 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace AplykoApi.DTO;
 
-public class LoginDto
+public class LoginRequestDto
 {
     [Required(ErrorMessage = "The Email field is required.")]
     [EmailAddress]
@@ -11,10 +12,11 @@ public class LoginDto
     [Required(ErrorMessage = "The Password field is required.")]
     public string Password { get; set; } = string.Empty;
 
+    [DefaultValue(false)]
     public bool RememberMe { get; set; }
 }
 
-public class RegisterDto
+public class RegisterRequestDto
 {
     [Required(ErrorMessage = "The Email field is required.")]
     [EmailAddress]
@@ -26,5 +28,6 @@ public class RegisterDto
         @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$",
         ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character."
     )]
+    [Required(ErrorMessage = "The Password field is required.")]
     public string Password { get; set; } = string.Empty;
 }
