@@ -1,4 +1,14 @@
-[*.cs]
-dotnet_diagnostic.SA1633.severity = none
+root = true
 
-dotnet_diagnostic.SA1201.severity = none
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.cs]
+csharp_new_line_before_open_brace = all
+csharp_indent_case_contents = true
+dotnet_diagnostic.CA2007.severity = none
