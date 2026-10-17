@@ -19,6 +19,12 @@ public sealed class UserController : ControllerBase
         _context = context;
     }
 
+    /// <summary>
+    /// Return the list of every user in the database, including their email, role, and creation date. This endpoint is protected and requires authentication.
+    /// </summary>
+    /// <response code="200">Returns the list of users</response>
+    /// <response code="401">If the user is not authenticated</response>
+    /// <returns></returns>
     // GET /api/user
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetAllUsers()
@@ -36,6 +42,12 @@ public sealed class UserController : ControllerBase
         return Ok(users);
     }
 
+    /// <summary>
+    /// Return the details of a specific user by their ID, including their email, role, and creation date. This endpoint is protected and requires authentication.
+    /// </summary>
+    /// <response code="200">Return the user by its ID</response>
+    /// <response code="401">If the user is not authenticated</response>
+    /// <returns></returns>
     // GET /api/user/{id}
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<UserResponseDto>> GetUserById(Guid id)
@@ -58,6 +70,14 @@ public sealed class UserController : ControllerBase
         return Ok(userDto);
     }
 
+    /// <summary>
+    /// Update the details of a specific user by their ID. This endpoint is protected and requires authentication.
+    /// </summary>
+    /// <response code="204">If the user was successfully updated</response>
+    /// <response code="401">If the user is not authenticated</response>
+    /// <param name="id"></param>
+    /// <param name="userData">The fields that need to be updated for the user</param>
+    /// <returns></returns>
     // PUT /api/user/{id}
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserRequestDto userData)
@@ -73,6 +93,13 @@ public sealed class UserController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Delete a specific user by their ID. This endpoint is protected and requires authentication.
+    /// </summary>
+    /// <response code="204">If the user was successfully deleted</response>
+    /// <response code="401">If the user is not authenticated</response>
+    /// <param name="id"></param>
+    /// <returns></returns>
     // DELETE /api/user/{id}
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteUser(Guid id)
