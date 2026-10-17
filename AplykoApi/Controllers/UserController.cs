@@ -56,8 +56,8 @@ internal sealed class UserController : ControllerBase
         return Ok(userDto);
     }
 
-    // POST /api/user
-    [HttpPost]
+    // POST /api/register
+    [HttpPost("/api/register")]
     public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto createUser)
     {
         string normalizedEmail = createUser.Email.Trim().ToLowerInvariant();
