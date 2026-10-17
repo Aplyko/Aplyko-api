@@ -1,6 +1,6 @@
 namespace AplykoApi.Utils.Enums;
 
-internal enum UserRole
+public enum UserRole
 {
     Applicant,
     Company,

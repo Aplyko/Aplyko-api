@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AplykoApi.Models;
 
-internal class UserProfile
+public class UserProfile
 {
     public Guid Id { get; set; }
 
