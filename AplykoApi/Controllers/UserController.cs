@@ -1,14 +1,16 @@
 using AplykoApi.DTO;
 using AplykoApi.Models;
 using AplykoApi.Utils.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AplykoApi.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
-internal sealed class UserController : ControllerBase
+public sealed class UserController : ControllerBase
 {
     private readonly AppDbContext _context;
 
@@ -19,10 +21,10 @@ internal sealed class UserController : ControllerBase
 
     // GET /api/user
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
+    public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetAllUsers()
     {
         var users = await _context.Users
-            .Select(u => new UserDto
+            .Select(u => new UserResponseDto()
             {
                 Id = u.Id,
                 Email = u.Email,
@@ -36,7 +38,7 @@ internal sealed class UserController : ControllerBase
 
     // GET /api/user/{id}
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<UserDto>> GetUserById(Guid id)
+    public async Task<ActionResult<UserResponseDto>> GetUserById(Guid id)
     {
         var user = await _context.Users.FindAsync(id);
 
@@ -45,7 +47,7 @@ internal sealed class UserController : ControllerBase
             return NotFound();
         }
 
-        var userDto = new UserDto
+        var userDto = new UserResponseDto
         {
             Id = user.Id,
             Email = user.Email,
@@ -56,63 +58,15 @@ internal sealed class UserController : ControllerBase
         return Ok(userDto);
     }
 
-    // POST /api/register
-    [HttpPost("/api/register")]
-    public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto createUser)
-    {
-        string normalizedEmail = createUser.Email.Trim().ToLowerInvariant();
-        bool emailAlreadyExists = await _context.Users.AnyAsync(u => u.Email == normalizedEmail);
-
-        if (emailAlreadyExists)
-        {
-            return Conflict(new { message = "This email is already used." });
-        }
-
-        string hashedPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(createUser.Password, workFactor: 12);
-
-        User user = new User
-        {
-            Id = Guid.NewGuid(),
-            Email = normalizedEmail,
-            Password = hashedPassword,
-            Role = UserRole.Applicant,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        try
-        {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is Npgsql.PostgresException { SqlState: "23505" })
-        {
-            return Conflict(new { message = "This email is already used." });
-        }
-
-        var createdDto = new UserDto
-        {
-            Id = user.Id,
-            Email = user.Email,
-            Role = user.Role,
-            CreatedAt = user.CreatedAt
-        };
-
-        return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, createdDto);
-    }
-
     // PUT /api/user/{id}
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserDto dto)
+    public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserRequestDto userData)
     {
         var user = await _context.Users.FindAsync(id);
         if (user == null)
         {
             return NotFound();
         }
-
-        user.Email = dto.Email;
-        user.Role = dto.Role;
-        user.Password = dto.Password;
 
         await _context.SaveChangesAsync();
 
