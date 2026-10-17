@@ -20,14 +20,21 @@ public sealed class AuthController : ControllerBase
         _context = context;
     }
 
+    /// <summary>
+    /// Authenticates a user and returns their data if successful. If the email or password is incorrect, it returns an Unauthorized response.
+    /// </summary>
+    /// <param name="userData">User's email and password, user can indicate if he wants the browser to keep the cookie for 14 days</param>
+    /// <response code="200">Returns the user's data if authentication is successful</response>
+    /// <response code="401">If the email or password is incorrect</response>
+    /// <returns>The user's data</returns>
     // POST /api/auth/login
     [HttpPost("[action]")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto userData)
     {
-        string normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+        string normalizedEmail = userData.Email.Trim().ToLowerInvariant();
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
 
-        if (user == null || !BCrypt.Net.BCrypt.EnhancedVerify(dto.Password, user.Password))
+        if (user == null || !BCrypt.Net.BCrypt.EnhancedVerify(userData.Password, user.Password))
         {
             return Unauthorized(new { message = "Invalid email or password." });
         }
@@ -43,8 +50,8 @@ public sealed class AuthController : ControllerBase
 
         AuthenticationProperties authProperties = new AuthenticationProperties
         {
-            IsPersistent = dto.RememberMe,
-            ExpiresUtc = dto.RememberMe ? DateTimeOffset.UtcNow.AddDays(14) : null
+            IsPersistent = userData.RememberMe,
+            ExpiresUtc = userData.RememberMe ? DateTimeOffset.UtcNow.AddDays(14) : null
         };
 
         await HttpContext.SignInAsync(
@@ -64,11 +71,18 @@ public sealed class AuthController : ControllerBase
         return Ok(userDto);
     }
 
+    /// <summary>
+    /// Create a new user account. If the email is already used, it returns a Conflict response.
+    /// </summary>
+    /// <response code="201">Returns the created user's data if registration is successful</response>
+    /// <response code="409">If the email is already used</response>
+    /// <param name="userData"></param>
+    /// <returns></returns>
     // POST /api/auth/register
     [HttpPost("[action]")]
-    public async Task<ActionResult<UserResponseDto>> Register(RegisterRequestDto register)
+    public async Task<ActionResult<UserResponseDto>> Register(RegisterRequestDto userData)
     {
-        string normalizedEmail = register.Email.Trim().ToLowerInvariant();
+        string normalizedEmail = userData.Email.Trim().ToLowerInvariant();
         bool emailAlreadyExists = await _context.Users.AnyAsync(u => u.Email == normalizedEmail);
 
         if (emailAlreadyExists)
@@ -76,7 +90,7 @@ public sealed class AuthController : ControllerBase
             return Conflict(new { message = "This email is already used." });
         }
 
-        string hashedPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(register.Password, workFactor: 12);
+        string hashedPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(userData.Password, workFactor: 12);
 
         User user = new User
         {
