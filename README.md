@@ -28,6 +28,15 @@ To run the application in production mode:
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
 
+---
+
+## API Documentation
+
+Once the application is running, you can explore the interactive API documentation via Scalar at:
+- **`http://{HOST}:{API_PORT}/scalar/v1`**
+
+
 ## Authors
 - David LIN
 - Villon ZHANG
+
