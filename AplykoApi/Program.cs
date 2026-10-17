@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using AplykoApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Scalar.AspNetCore;
 
 DotNetEnv.Env.TraversePath().Load();
 
@@ -17,15 +18,19 @@ var connectionString = builder.Configuration.GetConnectionString("connPostgres")
                        ??
                        $"Host=localhost;Port=5432;Database={Environment.GetEnvironmentVariable("PG_DB_NAME")};Username={Environment.GetEnvironmentVariable("PG_USER")};Password={Environment.GetEnvironmentVariable("PG_PASSWORD_DEV")}";
 
+// Configure JSON serialization to use string representation for enums
 builder.Services.AddControllers()
     .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
 
+// Configure Entity Framework Core with PostgreSQL and snake_case naming convention
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString)
         .UseSnakeCaseNamingConvention());
 
+// Configure route options to use lowercase URLs
 builder.Services.Configure<RouteOptions>(options => { options.LowercaseUrls = true; });
 
+// Setting up authentication with cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -65,6 +70,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
@@ -73,7 +79,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.MapGet("/", () => "Hot reloading working");
 
 app.Run();
