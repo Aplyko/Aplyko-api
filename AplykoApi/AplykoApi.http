@@ -1,6 +1,2 @@
-@AplykoApi_HostAddress = http://localhost:5209
-
-GET {{AplykoApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
+@AplykoApi_HostAddress = http://localhost:8080
+GET {{AplykoApi_HostAddress}}/
