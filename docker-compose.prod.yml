@@ -11,4 +11,4 @@ services:
       dockerfile: ./AplykoApi/Dockerfile.prod
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__default=Host=aplyko-db;Database=PersonDb;Username=${PG_USER};Password=${PG_PASSWORD_PROD}
+      - ConnectionStrings__connPostgres=Host=aplyko-db;Database=${PG_DB_NAME};Username=${PG_USER};Password=${PG_PASSWORD_PROD}
