@@ -22,7 +22,7 @@ public sealed class AuthController : ControllerBase
 
     // POST /api/auth/login
     [HttpPost("[action]")]
-    public async Task<IActionResult> Login([FromBody] LoginDto dto)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
     {
         string normalizedEmail = dto.Email.Trim().ToLowerInvariant();
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
@@ -32,16 +32,16 @@ public sealed class AuthController : ControllerBase
             return Unauthorized(new { message = "Invalid email or password." });
         }
 
-        var claims = new List<Claim>
+        List<Claim> claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
             new(ClaimTypes.Role, user.Role.ToString())
         };
 
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-        var authProperties = new AuthenticationProperties
+        AuthenticationProperties authProperties = new AuthenticationProperties
         {
             IsPersistent = dto.RememberMe,
             ExpiresUtc = dto.RememberMe ? DateTimeOffset.UtcNow.AddDays(14) : null
@@ -53,7 +53,7 @@ public sealed class AuthController : ControllerBase
             authProperties
         );
 
-        UserDto userDto = new UserDto
+        UserResponseDto userDto = new UserResponseDto
         {
             Id = user.Id,
             Email = user.Email,
@@ -66,7 +66,7 @@ public sealed class AuthController : ControllerBase
 
     // POST /api/auth/register
     [HttpPost("[action]")]
-    public async Task<ActionResult<UserDto>> Register(RegisterDto register)
+    public async Task<ActionResult<UserResponseDto>> Register(RegisterRequestDto register)
     {
         string normalizedEmail = register.Email.Trim().ToLowerInvariant();
         bool emailAlreadyExists = await _context.Users.AnyAsync(u => u.Email == normalizedEmail);
@@ -97,7 +97,7 @@ public sealed class AuthController : ControllerBase
             return Conflict(new { message = "This email is already used." });
         }
 
-        var createdDto = new UserDto
+        UserResponseDto createdDto = new UserResponseDto
         {
             Id = user.Id,
             Email = user.Email,
