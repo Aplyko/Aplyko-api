@@ -4,6 +4,7 @@ using AplykoApi.Utils.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using AplykoApi.Services;
 
 namespace AplykoApi.Controllers;
 
@@ -13,10 +14,12 @@ namespace AplykoApi.Controllers;
 public sealed class UserController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly PasswordUtils _passwordUtils;
 
     public UserController(AppDbContext context)
     {
         _context = context;
+        _passwordUtils = new PasswordUtils();
     }
 
     /// <summary>
@@ -91,6 +94,29 @@ public sealed class UserController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    [HttpPatch("{id:guid}/edit-password")]
+    public async Task<IActionResult> EditUserPassword(Guid id, [FromBody] EditPasswordRequestDto requestData)
+    {
+        var user = await _context.Users.FindAsync(id);
+
+        if (user == null)
+        {
+            return NotFound(new { message = "No user were found with this ID" });
+        }
+
+        bool isOldPasswordValid = _passwordUtils.VerifyPassword(requestData.OldPassword, user.Password);
+        if (!isOldPasswordValid)
+        {
+            return BadRequest(new { message = "The old password is incorrect" });
+        }
+
+        user.Password = _passwordUtils.HashPassword(requestData.NewPassword);
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "The password was changed successfully" });
     }
 
     /// <summary>

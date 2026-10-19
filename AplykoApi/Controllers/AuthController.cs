@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AplykoApi.DTO;
+using AplykoApi.Services;
 using AplykoApi.Utils.Enums;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,10 +15,12 @@ namespace AplykoApi.Controllers;
 public sealed class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly PasswordUtils _passwordUtils;
 
     public AuthController(AppDbContext context)
     {
         _context = context;
+        _passwordUtils = new PasswordUtils();
     }
 
     /// <summary>
@@ -34,7 +37,7 @@ public sealed class AuthController : ControllerBase
         string normalizedEmail = userData.Email.Trim().ToLowerInvariant();
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
 
-        if (user == null || !BCrypt.Net.BCrypt.EnhancedVerify(userData.Password, user.Password))
+        if (user == null || !_passwordUtils.VerifyPassword(userData.Password, user.Password))
         {
             return Unauthorized(new { message = "Invalid email or password." });
         }
@@ -90,7 +93,7 @@ public sealed class AuthController : ControllerBase
             return Conflict(new { message = "This email is already used." });
         }
 
-        string hashedPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(userData.Password, workFactor: 12);
+        string hashedPassword = _passwordUtils.HashPassword(userData.Password);
 
         User user = new User
         {
