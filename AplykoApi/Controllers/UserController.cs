@@ -96,6 +96,16 @@ public sealed class UserController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// This endpoint is to edit user password
+    /// </summary>
+    /// <response code="200">If the password was changed successfully</response>
+    /// <response code="400">If the old password is incorrect</response>
+    /// <response code="404">If the user was not found</response>
+    /// <param name="id"></param>
+    /// <param name="requestData"></param>
+    /// <returns></returns>
+    // PATCH /api/user/{id}/edit-password
     [HttpPatch("{id:guid}/edit-password")]
     public async Task<IActionResult> EditUserPassword(Guid id, [FromBody] EditPasswordRequestDto requestData)
     {
