@@ -23,7 +23,6 @@ services:
     depends_on:
       aplyko-db:
         condition: service_healthy
-        restart: true
     volumes:
       - ./AplykoApi:/source/AplykoApi
       - /source/AplykoApi/bin
