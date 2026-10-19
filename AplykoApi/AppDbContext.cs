@@ -22,8 +22,8 @@ internal class AppDbContext : DbContext
 
         modelBuilder.Entity<User>()
             .HasOne(u => u.Profile)
-            .WithOne(p => p.User)
-            .HasForeignKey<UserProfile>(p => p.UserId)
+            .WithOne()
+            .HasForeignKey<UserProfile>(p => p.Id)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<User>()

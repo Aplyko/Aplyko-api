@@ -25,7 +25,6 @@ namespace AplykoApi.Migrations
             modelBuilder.Entity("AplykoApi.Models.UserProfile", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
@@ -52,16 +51,8 @@ namespace AplykoApi.Migrations
                         .HasColumnType("character varying(30)")
                         .HasColumnName("phone_number");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
                     b.HasKey("Id")
                         .HasName("pk_user_profiles");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_user_profiles_user_id");
 
                     b.ToTable("user_profiles", (string)null);
                 });
@@ -104,14 +95,12 @@ namespace AplykoApi.Migrations
 
             modelBuilder.Entity("AplykoApi.Models.UserProfile", b =>
                 {
-                    b.HasOne("AplykoApi.User", "User")
+                    b.HasOne("AplykoApi.User", null)
                         .WithOne("Profile")
-                        .HasForeignKey("AplykoApi.Models.UserProfile", "UserId")
+                        .HasForeignKey("AplykoApi.Models.UserProfile", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_user_profiles_users_user_id");
-
-                    b.Navigation("User");
+                        .HasConstraintName("fk_user_profiles_users_id");
                 });
 
             modelBuilder.Entity("AplykoApi.User", b =>
