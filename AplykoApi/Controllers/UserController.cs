@@ -109,6 +109,11 @@ public sealed class UserController : ControllerBase
     [HttpPatch("{id:guid}/edit-password")]
     public async Task<IActionResult> EditUserPassword(Guid id, [FromBody] EditPasswordRequestDto requestData)
     {
+        if (requestData.NewPassword == requestData.OldPassword)
+        {
+            return BadRequest(new { message = "The new password cannot be the same as the old password" });
+        }
+
         var user = await _context.Users.FindAsync(id);
 
         if (user == null)
