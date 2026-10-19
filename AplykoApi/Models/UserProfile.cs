@@ -6,10 +6,6 @@ internal class UserProfile
 {
     public Guid Id { get; set; }
 
-    public Guid UserId { get; set; }
-
-    public User User { get; set; } = null!;
-
     [StringLength(30)]
     public string FirstName { get; set; } = string.Empty;
 
